@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Charles Meer — Administrative Virtual Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#0A1626;
+    --navy-900:#0F1F35;
+    --navy-800:#15304F;
+    --navy-600:#20518C;
+    --navy-400:#3E71B0;
+    --brass:#AD8A54;
+    --brass-soft:#D9C6A0;
+    --paper:#FFFFFF;
+    --paper-soft:#F5F7FA;
+    --paper-line:#E4E9F0;
+    --ink:#14213A;
+    --ink-soft:#5B6B84;
+    --ink-faint:#94A3B8;
+    --radius-sm:3px;
+    --radius-md:3px;
+    --radius-lg:4px;
+    --shadow-card:0 1px 0 rgba(15,31,53,.05);
+    --shadow-card-hover:0 1px 0 rgba(15,31,53,.05);
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important; transition-duration:.001ms !important; scroll-behavior:auto !important;}
+  }
+  h1,h2,h3,h4{font-family:'Fraunces',serif; margin:0; color:var(--navy-950); font-weight:440; letter-spacing:-.02em;}
+  p{margin:0; line-height:1.7; color:var(--ink-soft);}
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  button{font-family:inherit; cursor:pointer;}
+  ::selection{background:var(--brass-soft); color:var(--navy-950);}
+
+  .wrap{max-width:1180px; margin:0 auto; padding:0 32px;}
+  @media (max-width:640px){ .wrap{padding:0 22px;} }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:'IBM Plex Mono',monospace; font-size:.7rem; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--brass); font-weight:500;
+  }
+  .eyebrow::before{content:''; width:22px; height:1px; background:var(--brass);}
+  .eyebrow .issue-no{color:var(--ink-faint); font-style:italic; font-family:'Fraunces',serif; letter-spacing:0; text-transform:none; font-size:.82rem;}
+
+  /* Chip / label motif — echoes Gmail-label habit from the bio */
+  .chip{
+    display:inline-flex; align-items:center; gap:7px;
+    padding:7px 13px 7px 11px; border-radius:999px;
+    border:1px solid var(--paper-line); background:var(--paper);
+    font-family:'IBM Plex Mono',monospace; font-size:.74rem; letter-spacing:.02em;
+    color:var(--navy-900); white-space:nowrap;
+  }
+  .chip .dot{width:7px; height:7px; border-radius:50%; background:var(--navy-400); flex-shrink:0;}
+  .chip.dot-brass .dot{background:var(--brass);}
+  .chip.dot-navy .dot{background:var(--navy-800);}
+  .chip.dot-blue .dot{background:var(--navy-400);}
+  .chip-row{display:flex; flex-wrap:wrap; gap:10px;}
+
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 26px; border-radius:2px; border:1px solid transparent;
+    font-size:.9rem; font-weight:600; letter-spacing:.02em; text-transform:uppercase; font-family:'IBM Plex Mono',monospace;
+    transition:transform .35s var(--ease), box-shadow .35s var(--ease), background .3s var(--ease), color .3s var(--ease);
+  }
+  .btn-primary{background:var(--navy-950); color:#fff;}
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 14px 28px -10px rgba(10,22,38,.45);}
+  .btn-ghost{background:transparent; color:var(--navy-950); border-color:var(--navy-950);}
+  .btn-ghost:hover{background:var(--navy-950); color:#fff; transform:translateY(-2px);}
+  .btn-light{background:#fff; color:var(--navy-950);}
+  .btn-light:hover{transform:translateY(-2px); box-shadow:0 14px 28px -10px rgba(0,0,0,.35);}
+  .btn svg{width:16px; height:16px;}
+
+  /* NAV */
+  header.site-nav{
+    position:fixed; top:0; left:0; right:0; z-index:1000;
+    background:rgba(10,22,38,.88); backdrop-filter:blur(14px) saturate(140%);
+    border-bottom:1px solid rgba(255,255,255,.06);
+    transition:background .4s var(--ease);
+  }
+  .nav-inner{
+    max-width:1180px; margin:0 auto; padding:0 32px;
+    display:flex; align-items:center; justify-content:space-between;
+    height:76px;
+  }
+  @media (max-width:640px){ .nav-inner{padding:0 22px; height:68px;} }
+  .brand{display:flex; align-items:center; gap:10px; color:#fff;}
+  .brand-mark{
+    width:36px; height:36px; border-radius:9px; background:linear-gradient(155deg,var(--brass),#8f6f3c);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-weight:600; font-size:1rem; color:var(--navy-950);
+  }
+  .brand-text{font-family:'Fraunces',serif; font-size:1.08rem; letter-spacing:.01em;}
+  .brand-text span{display:block; font-family:'IBM Plex Mono',monospace; font-size:.62rem; letter-spacing:.14em; color:var(--brass-soft); text-transform:uppercase; margin-top:1px;}
+
+  nav.primary-links{display:flex; gap:2px;}
+  nav.primary-links a{
+    padding:9px 13px; border-radius:2px; font-size:.78rem; font-weight:500;
+    font-family:'IBM Plex Mono',monospace; letter-spacing:.04em; text-transform:uppercase;
+    color:rgba(255,255,255,.6); transition:color .25s var(--ease), background .25s var(--ease);
+  }
+  nav.primary-links a:hover{color:#fff; background:rgba(255,255,255,.06);}
+  nav.primary-links a.active{color:var(--navy-950); background:var(--brass-soft);}
+
+  .nav-cta{display:flex; align-items:center; gap:14px;}
+  .nav-cta .btn-primary{background:var(--brass); font-size:.85rem; padding:11px 20px;}
+  .nav-cta .btn-primary:hover{background:#c29c62;}
+
+  .hamburger{display:none; flex-direction:column; gap:5px; background:none; border:none; padding:8px;}
+  .hamburger span{width:22px; height:2px; background:#fff; border-radius:2px; transition:transform .3s, opacity .3s;}
+  .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .hamburger.open span:nth-child(2){opacity:0;}
+  .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+  @media (max-width:920px){
+    nav.primary-links{
+      position:fixed; top:68px; left:0; right:0; bottom:0;
+      background:var(--navy-950); flex-direction:column; padding:18px 22px;
+      transform:translateX(100%); transition:transform .4s var(--ease);
+      gap:2px;
+    }
+    nav.primary-links.open{transform:translateX(0);}
+    nav.primary-links a{padding:16px 8px; border-radius:0; border-bottom:1px solid rgba(255,255,255,.06); font-size:1rem;}
+    .nav-cta .btn-text{display:none;}
+    .hamburger{display:flex;}
+  }
+
+  /* PAGE / SECTION shell */
+  main{padding-top:76px;}
+  @media (max-width:640px){ main{padding-top:68px;} }
+  .page{display:none;}
+  .page.active{display:block;}
+
+  .section{padding:96px 0;}
+  .section-tight{padding:72px 0;}
+  .section-alt{background:var(--paper-soft);}
+  .section-navy{background:var(--navy-950); color:#fff;}
+  .section-navy p{color:rgba(255,255,255,.6);}
+  .section-navy h2, .section-navy h3{color:#fff;}
+  @media (max-width:640px){ .section{padding:64px 0;} .section-tight{padding:52px 0;} }
+
+  .section-head{max-width:640px; margin-bottom:52px;}
+  .section-head h2{font-size:clamp(1.7rem,3.2vw,2.5rem); margin-top:14px;}
+  .section-head p{margin-top:16px; font-size:1.03rem;}
+
+  hr.rule{border:none; border-top:1px solid var(--paper-line); margin:0;}
+
+  /* reveal animation */
+  [data-reveal]{opacity:0; transform:translateY(18px); animation:none;}
+  .page.active [data-reveal]{animation:reveal .7s var(--ease) forwards;}
+  @keyframes reveal{to{opacity:1; transform:translateY(0);}}
+
+  /* HERO */
+  .hero{
+    position:relative; padding:168px 0 100px; overflow:hidden;
+    background:
+      radial-gradient(circle at 82% 12%, rgba(173,138,84,.16), transparent 45%),
+      linear-gradient(180deg, var(--navy-950) 0%, var(--navy-900) 100%);
+    color:#fff;
+  }
+  .hero::before{
+    content:''; position:absolute; inset:0; opacity:.35; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size:44px 44px;
+    mask-image:radial-gradient(ellipse 60% 55% at 70% 20%, black, transparent);
+  }
+  .hero-inner{position:relative; z-index:1; max-width:800px;}
+  .hero h1{font-size:clamp(2.3rem,5.6vw,4rem); line-height:1.08; margin-top:22px; color:#fff; font-weight:440; letter-spacing:-.025em;}
+  .hero h1 em{font-style:italic; color:var(--brass-soft); font-weight:400;}
+  .hero .lede{margin-top:22px; font-size:1.12rem; color:rgba(255,255,255,.66); max-width:600px;}
+  .hero-actions{display:flex; gap:14px; margin-top:36px; flex-wrap:wrap;}
+  .hero-sub{padding:0;}
+  .page:not(#page-home) .hero{padding:150px 0 80px;}
+  .page:not(#page-home) .hero h1{font-size:clamp(1.9rem,4vw,2.9rem);}
+  .page:not(#page-home) .hero .lede{font-size:1.02rem;}
+
+  /* "How I stay organized" strip on home */
+  .habit-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--paper-line); border:1px solid var(--paper-line); border-radius:var(--radius-lg); overflow:hidden; margin-top:-58px; position:relative; z-index:2;}
+  @media (max-width:760px){ .habit-grid{grid-template-columns:1fr;} }
+  .habit-card{background:#fff; padding:32px 30px;}
+  .habit-card .icon-wrap{width:42px; height:42px; border-radius:10px; background:var(--paper-soft); display:flex; align-items:center; justify-content:center; color:var(--navy-800); margin-bottom:16px;}
+  .habit-card h4{font-size:1.05rem; font-weight:600; font-family:'Inter',sans-serif; color:var(--navy-950);}
+  .habit-card p{margin-top:8px; font-size:.92rem;}
+
+  /* grids/cards */
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:28px;}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:24px;}
+  .grid-4{display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
+  @media (max-width:920px){ .grid-3{grid-template-columns:repeat(2,1fr);} .grid-4{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:640px){ .grid-2,.grid-3,.grid-4{grid-template-columns:1fr;} }
+
+  .card{
+    background:#fff; border:1px solid var(--paper-line); border-top:2px solid var(--navy-950); border-radius:var(--radius-md);
+    padding:30px 26px; box-shadow:none;
+    transition:transform .35s var(--ease), border-color .35s var(--ease);
+  }
+  .card:hover{transform:translateY(-3px); border-top-color:var(--brass);}
+  .card .icon-wrap{
+    width:44px; height:44px; border-radius:2px; background:var(--navy-950);
+    display:flex; align-items:center; justify-content:center; color:var(--brass-soft); margin-bottom:18px;
+  }
+  .card h3{font-size:1.12rem; font-weight:600; font-family:'Inter',sans-serif; color:var(--navy-950);}
+  .card p{margin-top:9px; font-size:.93rem;}
+  .icon{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;}
+
+  /* services preview on home */
+  .service-preview{display:flex; align-items:center; justify-content:space-between; margin-top:44px;}
+
+  /* CTA banner */
+  .cta-banner{
+    background:linear-gradient(120deg, var(--navy-950), var(--navy-800));
+    border-radius:4px; padding:56px 52px; color:#fff;
+    display:flex; align-items:center; justify-content:space-between; gap:32px; flex-wrap:wrap;
+    position:relative; overflow:hidden;
+  }
+  .cta-banner::after{content:''; position:absolute; width:280px; height:280px; border-radius:50%; background:radial-gradient(circle, rgba(173,138,84,.28), transparent 70%); right:-80px; top:-90px;}
+  .cta-banner h3{color:#fff; font-size:1.6rem; position:relative;}
+  .cta-banner p{color:rgba(255,255,255,.62); margin-top:8px; position:relative;}
+  .cta-banner .btn{position:relative;}
+
+  /* about page */
+  .about-grid{display:grid; grid-template-columns:.85fr 1.15fr; gap:56px; align-items:start;}
+  @media (max-width:820px){ .about-grid{grid-template-columns:1fr;} }
+  .avatar-block{position:sticky; top:110px;}
+  .avatar-frame{
+    aspect-ratio:4/5; border-radius:var(--radius-lg); background:linear-gradient(160deg,var(--navy-900),var(--navy-800));
+    display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
+  }
+  .avatar-frame::before{
+    content:''; position:absolute; inset:0; opacity:.5;
+    background-image:linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size:32px 32px;
+  }
+  .avatar-initials{
+    width:110px; height:110px; border-radius:50%; background:var(--brass); color:var(--navy-950);
+    display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-size:2.4rem;
+    position:relative; z-index:1; box-shadow:0 20px 40px -12px rgba(0,0,0,.5);
+  }
+  .avatar-caption{margin-top:18px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint);}
+  .about-copy p + p{margin-top:18px;}
+  .about-copy h3{margin-top:44px; font-size:1.3rem;}
+  .about-copy .chip-row{margin-top:20px;}
+  .drop-cap::first-letter{
+    font-family:'Fraunces',serif; font-style:italic; font-weight:500; font-size:3.8rem; line-height:.75;
+    float:left; margin:.06em .08em 0 0; color:var(--navy-950);
+  }
+
+  /* skills page */
+  .skill-cat{margin-bottom:14px;}
+  .skill-cat h4{font-family:'IBM Plex Mono',monospace; font-size:.74rem; letter-spacing:.1em; text-transform:uppercase; color:var(--brass); font-weight:500; margin-bottom:14px;}
+  .exp-list{display:grid; grid-template-columns:1fr 1fr; gap:14px 32px; margin-top:24px;}
+  @media (max-width:640px){ .exp-list{grid-template-columns:1fr;} }
+  .exp-item{display:flex; gap:12px; align-items:flex-start; font-size:.94rem; color:var(--ink);}
+  .exp-item svg{flex-shrink:0; margin-top:3px; color:var(--navy-600);}
+
+  /* tools page */
+  .tool-group{margin-bottom:48px;}
+  .tool-group h4{font-family:'IBM Plex Mono',monospace; font-size:.74rem; letter-spacing:.1em; text-transform:uppercase; color:var(--brass); margin-bottom:18px;}
+  .tool-badges{display:flex; flex-wrap:wrap; gap:12px;}
+  .tool-badge{
+    display:flex; align-items:center; gap:10px; padding:12px 18px; border-radius:12px;
+    background:#fff; border:1px solid var(--paper-line); font-size:.9rem; font-weight:500; color:var(--navy-950);
+    transition:border-color .3s var(--ease), transform .3s var(--ease);
+  }
+  .tool-badge:hover{border-color:var(--navy-400); transform:translateY(-2px);}
+  .tool-mono{
+    width:28px; height:28px; border-radius:8px; background:var(--navy-950); color:var(--brass-soft);
+    display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-size:.8rem; flex-shrink:0;
+  }
+
+  /* why hire */
+  .reason-list{display:flex; flex-direction:column; gap:0;}
+  .reason-item{display:grid; grid-template-columns:60px 1fr; gap:22px; padding:28px 0; border-bottom:1px solid var(--paper-line);}
+  .reason-item:first-child{padding-top:0;}
+  .reason-num{font-family:'Fraunces',serif; font-size:1.6rem; color:var(--brass); font-style:italic;}
+  .reason-item h3{font-size:1.1rem; font-family:'Inter',sans-serif; font-weight:600; color:var(--navy-950);}
+  .reason-item p{margin-top:8px; font-size:.94rem; max-width:560px;}
+
+  /* testimonials */
+  .quote-card{background:#fff; border:1px solid var(--paper-line); border-radius:var(--radius-md); padding:32px; box-shadow:var(--shadow-card); position:relative;}
+  .quote-mark{font-family:'Fraunces',serif; font-size:3rem; color:var(--brass-soft); line-height:1; font-style:italic;}
+  .quote-card p.quote-text{color:var(--ink); font-size:1.02rem; margin-top:4px; font-style:italic;}
+  .quote-source{display:flex; align-items:center; gap:12px; margin-top:22px;}
+  .quote-avatar{width:38px; height:38px; border-radius:50%; background:var(--navy-800); color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-size:.85rem;}
+  .quote-name{font-size:.86rem; font-weight:600; color:var(--navy-950);}
+  .quote-role{font-size:.78rem; color:var(--ink-faint);}
+  .placeholder-tag{
+    position:absolute; top:20px; right:20px; font-family:'IBM Plex Mono',monospace; font-size:.62rem;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); border:1px dashed var(--paper-line); padding:4px 9px; border-radius:999px;
+  }
+
+  /* FAQ accordion */
+  .faq-item{border-bottom:1px solid var(--paper-line);}
+  .faq-item:first-child{border-top:1px solid var(--paper-line);}
+  .faq-q{
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+    padding:24px 4px; background:none; border:none; width:100%; text-align:left;
+  }
+  .faq-q h4{font-family:'Inter',sans-serif; font-size:1rem; font-weight:600; color:var(--navy-950);}
+  .faq-q svg{flex-shrink:0; transition:transform .35s var(--ease); color:var(--navy-600);}
+  .faq-item.open .faq-q svg{transform:rotate(45deg);}
+  .faq-a{max-height:0; overflow:hidden; transition:max-height .4s var(--ease);}
+  .faq-a-inner{padding:0 4px 26px; max-width:640px; font-size:.94rem;}
+
+  /* contact */
+  .contact-grid{display:grid; grid-template-columns:.85fr 1.15fr; gap:56px;}
+  @media (max-width:820px){ .contact-grid{grid-template-columns:1fr;} }
+  .contact-info-card{background:var(--navy-950); color:#fff; border-radius:var(--radius-lg); padding:40px 34px;}
+  .contact-info-card h3{color:#fff; font-size:1.3rem;}
+  .contact-row{display:flex; gap:14px; align-items:flex-start; margin-top:22px;}
+  .contact-row svg{color:var(--brass-soft); flex-shrink:0; margin-top:2px;}
+  .contact-row .label{font-family:'IBM Plex Mono',monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.4);}
+  .contact-row .value{font-size:.95rem; margin-top:3px; color:#fff;}
+  .social-row{display:flex; gap:10px; margin-top:30px;}
+  .social-btn{width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; transition:background .3s;}
+  .social-btn:hover{background:var(--brass);}
+
+  .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:560px){ .form-grid{grid-template-columns:1fr;} }
+  .field{display:flex; flex-direction:column; gap:8px; margin-bottom:18px;}
+  .field.full{grid-column:1/-1;}
+  .field label{font-family:'IBM Plex Mono',monospace; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft);}
+  .field input, .field select, .field textarea{
+    padding:13px 15px; border-radius:10px; border:1px solid var(--paper-line); background:var(--paper-soft);
+    font-family:'Inter',sans-serif; font-size:.94rem; color:var(--ink); transition:border-color .3s, background .3s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{outline:none; border-color:var(--navy-400); background:#fff;}
+  .field textarea{resize:vertical; min-height:120px;}
+  .form-note{font-size:.82rem; color:var(--ink-faint); margin-top:6px;}
+  .success-msg{display:none; align-items:center; gap:10px; background:#F0F6EF; border:1px solid #C9DFC4; color:#33613A; padding:16px 18px; border-radius:12px; font-size:.9rem; margin-top:18px;}
+  .success-msg.show{display:flex;}
+
+  /* footer */
+  footer{background:var(--navy-950); color:rgba(255,255,255,.55); padding:64px 0 28px;}
+  .footer-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:40px; padding-bottom:44px; border-bottom:1px solid rgba(255,255,255,.08);}
+  @media (max-width:760px){ .footer-grid{grid-template-columns:1fr 1fr; row-gap:32px;} }
+  @media (max-width:480px){ .footer-grid{grid-template-columns:1fr;} }
+  .footer-grid h5{font-family:'IBM Plex Mono',monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.4); margin-bottom:16px; font-weight:500;}
+  .footer-grid a{display:block; font-size:.88rem; padding:6px 0; color:rgba(255,255,255,.62); transition:color .25s;}
+  .footer-grid a:hover{color:#fff;}
+  .footer-brand p{color:rgba(255,255,255,.5); font-size:.88rem; margin-top:14px; max-width:280px;}
+  .footer-bottom{display:flex; justify-content:space-between; align-items:center; padding-top:24px; font-size:.8rem; flex-wrap:wrap; gap:10px;}
+
+  .fade-shift{animation:fadeShift .55s var(--ease);}
+  @keyframes fadeShift{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="nav-inner">
+    <a href="#home" class="brand" data-nav="home">
+      <span class="brand-mark">CM</span>
+      <span class="brand-text">Charles Meer<span>Virtual Assistant</span></span>
+    </a>
+    <nav class="primary-links" id="primaryLinks">
+      <a href="#home" data-nav="home">Home</a>
+      <a href="#about" data-nav="about">About</a>
+      <a href="#services" data-nav="services">Services</a>
+      <a href="#skills" data-nav="skills">Skills</a>
+      <a href="#tools" data-nav="tools">Tools</a>
+      <a href="#why" data-nav="why">Why Hire Me</a>
+      <a href="#testimonials" data-nav="testimonials">Testimonials</a>
+      <a href="#faq" data-nav="faq">FAQ</a>
+      <a href="#contact" data-nav="contact">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#contact" data-nav="contact" class="btn btn-primary"><span class="btn-text">Get in touch</span></a>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <span class="eyebrow" data-reveal><span class="issue-no">N&deg; 00</span>Administrative Virtual Assistant · Calamba City, PH</span>
+        <h1 data-reveal style="animation-delay:.05s">Detail-driven admin support<br>so you can focus on <em>growing your business.</em></h1>
+        <p class="lede" data-reveal style="animation-delay:.1s">I'm Charles — a Computer Science student who's spent years building organized systems out of necessity, and now puts that same discipline to work for business owners who'd rather grow their business than manage their inbox.</p>
+        <div class="hero-actions" data-reveal style="animation-delay:.15s">
+          <a href="#services" data-nav="services" class="btn btn-light">View Services</a>
+          <a href="#contact" data-nav="contact" class="btn btn-ghost" style="border-color:rgba(255,255,255,.35); color:#fff;">Get in Touch</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="habit-grid" data-reveal>
+        <div class="habit-card">
+          <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></div>
+          <h4>Google Calendar</h4>
+          <p>Every class, deadline, and quiz lives on one calendar — nothing gets discovered at the last minute.</p>
+        </div>
+        <div class="habit-card">
+          <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/><circle cx="18" cy="6" r="3" fill="#fff" stroke="var(--brass)"/></svg></div>
+          <h4>Gmail Labels</h4>
+          <p>Every message gets tagged the moment it arrives, so nothing important is buried under newsletters.</p>
+        </div>
+        <div class="habit-card">
+          <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg></div>
+          <h4>Drive Folders</h4>
+          <p>Files are named and filed with a system, not scattered — so anything can be found in seconds.</p>
+        </div>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <span class="eyebrow">The short version</span>
+          <h2>Organization isn't a skill I studied. It's a habit I built.</h2>
+          <p>Managing a Computer Science course load — overlapping deadlines, group projects, exams, and requirements — taught me that nothing runs smoothly without a system behind it. I started building those systems for myself. Now I build them for the people who hire me.</p>
+        </div>
+        <a href="#about" data-nav="about" class="btn btn-ghost" data-reveal>Read My Story →</a>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="wrap">
+        <div class="service-preview" data-reveal>
+          <div class="section-head" style="margin-bottom:0;">
+            <span class="eyebrow">What I can take off your plate</span>
+            <h2>Support built around your daily workload.</h2>
+          </div>
+          <a href="#services" data-nav="services" class="btn btn-ghost" style="flex-shrink:0;">All Services →</a>
+        </div>
+        <div class="grid-4" style="margin-top:40px;" data-reveal>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg></div>
+            <h3>Email Management</h3>
+            <p>Inbox sorting, labeling, and prioritizing so nothing important slips through.</p>
+          </div>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></div>
+            <h3>Calendar Management</h3>
+            <p>Scheduling, reminders, and conflict-free planning for your week.</p>
+          </div>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M5 4h14v4H5zM5 10h14v10H5z"/><path d="M9 14h6M9 17h6"/></svg></div>
+            <h3>Data Entry</h3>
+            <p>Accurate, structured entry into the spreadsheets and systems you already use.</p>
+          </div>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg></div>
+            <h3>File Organization</h3>
+            <p>Clear folder structures in Drive so your files are easy to find, always.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="cta-banner" data-reveal>
+          <div>
+            <h3>Ready to hand off the busywork?</h3>
+            <p>Let's talk about what's eating up your week — and how I can take it off your hands.</p>
+          </div>
+          <a href="#contact" data-nav="contact" class="btn btn-light">Start the Conversation</a>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="page" id="page-about">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <span class="eyebrow" data-reveal><span class="issue-no">N&deg; 01</span>About Me</span>
+        <h1 data-reveal style="animation-delay:.05s">The habits behind the help I offer.</h1>
+        <p class="lede" data-reveal style="animation-delay:.1s">A little about where I come from, how I stay organized, and why I chose this path.</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="wrap about-grid">
+        <div class="avatar-block" data-reveal>
+          <div class="avatar-frame">
+            <div class="avatar-initials">CM</div>
+          </div>
+          <p class="avatar-caption">Photo coming soon</p>
+          <a href="#contact" data-nav="contact" class="btn btn-ghost" style="width:100%; justify-content:center; margin-top:16px; padding:12px 20px; font-size:.85rem;">Request My Resume</a>
+        </div>
+
+        <div class="about-copy" data-reveal>
+          <span class="eyebrow">My Story</span>
+          <h2 style="margin-top:14px; font-size:1.9rem;">Charles Jerewin M. Meer</h2>
+          <p class="drop-cap" style="margin-top:20px;">I grew up in Brgy. Stabe, Canlubang, Calamba City, with my family — a fairly quiet upbringing that taught me the value of steady routines. Today, I live in an apartment near City College of Calamba, where I'm pursuing my Bachelor of Science in Computer Science.</p>
+          <p>Being a Computer Science student means juggling deadlines, quizzes, exams, and long-term projects, often all at once. There's no way through that without discipline and planning — so over time, I built systems for myself instead of relying on memory or good intentions.</p>
+          <p>I use Google Calendar to track every class, deadline, quiz, online session, and project, so nothing catches me off guard. I also keep my Gmail inbox organized with labels, which means important messages stay visible while newsletters and notifications get filed away without cluttering my day.</p>
+          <p>Somewhere along the way, I realized this wasn't just a coping mechanism for school — I genuinely enjoy organizing digital workspaces and helping things run more smoothly. That realization is what led me here.</p>
+
+          <h3>Why I Chose Administrative Virtual Assistance</h3>
+          <p>Every hour a business owner spends sorting emails, resolving calendar conflicts, or updating records is an hour that could go toward growing their business instead. I want to be the person who takes those tasks off their plate.</p>
+          <p>What draws me to this work isn't just completing tasks — it's building organized systems that make everyday operations easier to manage. My Computer Science background shapes how I approach that: logically, methodically, and with an eye for where a process can be improved. I don't just want to manage an inbox or copy over data — I want to notice where a workflow is clunky and quietly make it better.</p>
+          <p>Right now, my focus is simple: learn how a client's workflow actually runs — their inbox, their calendar, their day-to-day — and become someone they can hand things to without a second thought. If I do that well, it's not just another task checked off. It's an extra hour back in someone's day.</p>
+
+          <h3>My Personality</h3>
+          <p>A few honest words for how I'd describe myself:</p>
+          <div class="chip-row">
+            <span class="chip dot-navy"><span class="dot"></span>Organized</span>
+            <span class="chip dot-brass"><span class="dot"></span>Detail-oriented</span>
+            <span class="chip dot-blue"><span class="dot"></span>Outgoing</span>
+            <span class="chip dot-navy"><span class="dot"></span>Collaborative</span>
+            <span class="chip dot-brass"><span class="dot"></span>Respectful</span>
+            <span class="chip dot-blue"><span class="dot"></span>Good Listener</span>
+            <span class="chip dot-navy"><span class="dot"></span>Reliable</span>
+            <span class="chip dot-brass"><span class="dot"></span>Professional</span>
+            <span class="chip dot-blue"><span class="dot"></span>Calm Under Pressure</span>
+            <span class="chip dot-navy"><span class="dot"></span>Always Learning</span>
+          </div>
+          <p style="margin-top:20px; font-size:.94rem;">People who know me tend to say the same two things: that I notice patterns quickly and can usually troubleshoot my way to a fix once I understand a system, and that I'm generous with what I know — I like sharing resources and helping where I can, not just keeping my head down.</p>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="page" id="page-services">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <span class="eyebrow" data-reveal><span class="issue-no">N&deg; 02</span>Services</span>
+        <h1 data-reveal style="animation-delay:.05s">What I can help with.</h1>
+        <p class="lede" data-reveal style="animation-delay:.1s">Practical, day-to-day administrative support — scoped clearly so you always know what you're getting.</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="grid-3" data-reveal>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg></div>
+            <h3>Email Management</h3>
+            <p>Inbox sorting, labeling, and flagging priority messages so you always know what needs your attention first — and what can wait.</p>
+          </div>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></div>
+            <h3>Calendar Management</h3>
+            <p>Scheduling, rescheduling, and reminders that keep your days conflict-free and your commitments visible at a glance.</p>
+          </div>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M5 4h14v4H5zM5 10h14v10H5z"/><path d="M9 14h6M9 17h6"/></svg></div>
+            <h3>Data Entry</h3>
+            <p>Careful, accurate entry into spreadsheets, forms, and systems — double-checked so the numbers you rely on are correct.</p>
+          </div>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+            <h3>Internet Research</h3>
+            <p>Gathering and organizing information — vendors, competitors, resources — into something you can actually act on.</p>
+          </div>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6z"/><path d="M15 3v5h5"/><path d="M9 13h6M9 17h6"/></svg></div>
+            <h3>Document Formatting</h3>
+            <p>Clean, consistent formatting for proposals, reports, and letters — polished and ready to send.</p>
+          </div>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg></div>
+            <h3>Spreadsheet Management</h3>
+            <p>Building and maintaining spreadsheets that stay organized as your data grows, not just on day one.</p>
+          </div>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg></div>
+            <h3>File Organization</h3>
+            <p>Logical folder structures in Google Drive so every file has a home — and you can find it in seconds.</p>
+          </div>
+          <div class="card">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/><path d="M5 20a7 7 0 0114 0"/></svg></div>
+            <h3>General Administrative Support</h3>
+            <p>The day-to-day tasks that don't fit a single label — handled with the same care as everything else.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-navy">
+      <div class="wrap">
+        <div class="cta-banner" style="background:transparent; padding:0;" data-reveal>
+          <div>
+            <h3>Not sure which service fits?</h3>
+            <p>Tell me what's taking up your time, and I'll help you figure out where to start.</p>
+          </div>
+          <a href="#contact" data-nav="contact" class="btn btn-light">Let's Talk</a>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="page" id="page-skills">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <span class="eyebrow" data-reveal><span class="issue-no">N&deg; 03</span>Skills</span>
+        <h1 data-reveal style="animation-delay:.05s">Strengths built through practice, not just theory.</h1>
+        <p class="lede" data-reveal style="animation-delay:.1s">A mix of analytical thinking, organizational instinct, and habits I've sharpened through years of managing my own workload.</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="grid-2" data-reveal>
+          <div>
+            <div class="skill-cat">
+              <h4>Thinking</h4>
+              <div class="chip-row">
+                <span class="chip dot-navy"><span class="dot"></span>Analytical Problem-Solving</span>
+                <span class="chip dot-brass"><span class="dot"></span>Critical Thinking</span>
+                <span class="chip dot-blue"><span class="dot"></span>Process Improvement Mindset</span>
+                <span class="chip dot-navy"><span class="dot"></span>Workflow Optimization</span>
+              </div>
+            </div>
+            <div class="skill-cat">
+              <h4>Organization</h4>
+              <div class="chip-row">
+                <span class="chip dot-navy"><span class="dot"></span>Organization</span>
+                <span class="chip dot-brass"><span class="dot"></span>Workflow Management</span>
+                <span class="chip dot-blue"><span class="dot"></span>Digital Organization</span>
+                <span class="chip dot-navy"><span class="dot"></span>Attention to Detail</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="skill-cat">
+              <h4>People</h4>
+              <div class="chip-row">
+                <span class="chip dot-brass"><span class="dot"></span>Respectful Communication</span>
+                <span class="chip dot-blue"><span class="dot"></span>Collaborative</span>
+              </div>
+            </div>
+            <div class="skill-cat">
+              <h4>Growth</h4>
+              <div class="chip-row">
+                <span class="chip dot-blue"><span class="dot"></span>Fast Learner</span>
+                <span class="chip dot-navy"><span class="dot"></span>Technology-Oriented</span>
+                <span class="chip dot-brass"><span class="dot"></span>Rapid Tool Mastery</span>
+              </div>
+            </div>
+            <div class="skill-cat">
+              <h4>Currently Expanding</h4>
+              <div class="chip-row">
+                <span class="chip" style="border-style:dashed;"><span class="dot" style="background:var(--ink-faint);"></span>CRM Basics</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <span class="eyebrow">Administrative Experience</span>
+          <h2>Real practice, built through school and personal systems.</h2>
+          <p>I'm early in my professional VA journey, so this isn't client work — it's the practical administrative experience I've built managing my own academic life. It's exactly the kind of work I'd be doing for you, just applied to my own responsibilities first.</p>
+        </div>
+        <div class="exp-list" data-reveal>
+          <div class="exp-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Managing Google Calendar for classes and deadlines</div>
+          <div class="exp-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Organizing Gmail using labels and filters</div>
+          <div class="exp-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Tracking quizzes, exams, and requirements</div>
+          <div class="exp-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Tracking projects and assignments end-to-end</div>
+          <div class="exp-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Preparing and formatting documents</div>
+          <div class="exp-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Creating and maintaining spreadsheets</div>
+          <div class="exp-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Building presentations for coursework</div>
+          <div class="exp-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Conducting online research for projects</div>
+          <div class="exp-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Organizing files inside Google Drive</div>
+          <div class="exp-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Managing schedules across school and personal life</div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- TOOLS -->
+  <section class="page" id="page-tools">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <span class="eyebrow" data-reveal><span class="issue-no">N&deg; 04</span>Tools</span>
+        <h1 data-reveal style="animation-delay:.05s">The tools I already work in daily.</h1>
+        <p class="lede" data-reveal style="animation-delay:.1s">No steep learning curve — these are the platforms I use every day for school, which translate directly to admin work.</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="tool-group" data-reveal>
+          <h4>Google Workspace</h4>
+          <div class="tool-badges">
+            <span class="tool-badge"><span class="tool-mono">G</span>Gmail</span>
+            <span class="tool-badge"><span class="tool-mono">D</span>Google Docs</span>
+            <span class="tool-badge"><span class="tool-mono">S</span>Google Sheets</span>
+            <span class="tool-badge"><span class="tool-mono">P</span>Google Slides</span>
+            <span class="tool-badge"><span class="tool-mono">Dr</span>Google Drive</span>
+            <span class="tool-badge"><span class="tool-mono">C</span>Google Calendar</span>
+            <span class="tool-badge"><span class="tool-mono">M</span>Google Meet</span>
+          </div>
+        </div>
+        <div class="tool-group" data-reveal>
+          <h4>Microsoft Office</h4>
+          <div class="tool-badges">
+            <span class="tool-badge"><span class="tool-mono">W</span>Word</span>
+            <span class="tool-badge"><span class="tool-mono">E</span>Excel</span>
+            <span class="tool-badge"><span class="tool-mono">O</span>Outlook</span>
+          </div>
+        </div>
+        <div class="tool-group" data-reveal>
+          <h4>Other</h4>
+          <div class="tool-badges">
+            <span class="tool-badge"><span class="tool-mono">Ca</span>Canva</span>
+            <span class="tool-badge"><span class="tool-mono">Z</span>Zoom</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- WHY HIRE ME -->
+  <section class="page" id="page-why">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <span class="eyebrow" data-reveal><span class="issue-no">N&deg; 05</span>Why Hire Me</span>
+        <h1 data-reveal style="animation-delay:.05s">I won't pretend I have years of experience.</h1>
+        <p class="lede" data-reveal style="animation-delay:.1s">What I bring instead is real, practiced discipline — and a genuine commitment to getting the details right.</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="wrap grid-2" style="align-items:start;">
+        <div class="reason-list" data-reveal>
+          <div class="reason-item">
+            <span class="reason-num">01</span>
+            <div><h3>My Ability to Stay Organized</h3><p>Organization isn't something I switch on for work — it's how I operate every day, across school, projects, and my own systems.</p></div>
+          </div>
+          <div class="reason-item">
+            <span class="reason-num">02</span>
+            <div><h3>My Willingness to Continuously Learn</h3><p>I pick up new tools and workflows quickly, and I'd rather ask a clarifying question than guess and get it wrong.</p></div>
+          </div>
+          <div class="reason-item">
+            <span class="reason-num">03</span>
+            <div><h3>My Computer Science Background</h3><p>I naturally approach admin work with logical thinking and structure — spotting where a process can run more smoothly.</p></div>
+          </div>
+          <div class="reason-item">
+            <span class="reason-num">04</span>
+            <div><h3>My Attention to Detail</h3><p>Small errors compound. I double-check my work because accuracy matters more than speed.</p></div>
+          </div>
+          <div class="reason-item">
+            <span class="reason-num">05</span>
+            <div><h3>My Communication Skills</h3><p>I keep you informed, ask when something's unclear, and make sure nothing gets lost between us.</p></div>
+          </div>
+          <div class="reason-item">
+            <span class="reason-num">06</span>
+            <div><h3>My Commitment to Saving You Time</h3><p>Every task I take on is one less thing standing between you and the parts of your business only you can do.</p></div>
+          </div>
+          <div class="reason-item">
+            <span class="reason-num">07</span>
+            <div><h3>How I Handle Pressure</h3><p>When deadlines get tight, I don't freeze — I break the work into clear, prioritized steps and keep you posted the moment something needs your input, so you're never left guessing where things stand.</p></div>
+          </div>
+        </div>
+
+        <div data-reveal>
+          <div class="card" style="background:var(--navy-950); border:none;">
+            <span class="eyebrow" style="color:var(--brass-soft);">Who I Work Best With</span>
+            <h3 style="color:#fff; margin-top:14px; font-size:1.3rem;">My Ideal Clients</h3>
+            <p style="color:rgba(255,255,255,.6); margin-top:10px; font-size:.92rem;">I'm especially suited to support:</p>
+            <div class="chip-row" style="margin-top:20px;">
+              <span class="chip" style="background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:#fff;"><span class="dot" style="background:var(--brass-soft);"></span>Small Businesses</span>
+              <span class="chip" style="background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:#fff;"><span class="dot" style="background:var(--brass-soft);"></span>Startups</span>
+              <span class="chip" style="background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:#fff;"><span class="dot" style="background:var(--brass-soft);"></span>Healthcare Professionals</span>
+              <span class="chip" style="background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:#fff;"><span class="dot" style="background:var(--brass-soft);"></span>Entrepreneurs</span>
+              <span class="chip" style="background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:#fff;"><span class="dot" style="background:var(--brass-soft);"></span>Fully Remote Businesses</span>
+            </div>
+            <hr class="rule" style="border-color:rgba(255,255,255,.12); margin:26px 0;">
+            <span class="eyebrow" style="color:var(--brass-soft);">Availability</span>
+            <div class="chip-row" style="margin-top:14px;">
+              <span class="chip" style="background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:#fff;"><span class="dot" style="background:var(--brass-soft);"></span>Part-time</span>
+              <span class="chip" style="background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:#fff;"><span class="dot" style="background:var(--brass-soft);"></span>Freelance</span>
+              <span class="chip" style="background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:#fff;"><span class="dot" style="background:var(--brass-soft);"></span>Project-based</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="wrap" style="max-width:720px; text-align:center;" data-reveal>
+        <hr class="rule" style="max-width:60px; margin:0 auto 28px; border-top-color:var(--brass);">
+        <div class="quote-mark" style="text-align:center;">"</div>
+        <h2 style="font-size:1.7rem; font-style:italic; font-weight:420; line-height:1.4;">While I'm at the start of my VA career, I'm serious about proving it through the quality of my work. Every task is a chance to sharpen how I operate — and that growth translates directly into smoother, more dependable support for your business.</h2>
+        <p style="margin-top:22px; font-family:'IBM Plex Mono',monospace; font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint);">— On being asked, "Why hire a beginner?"</p>
+        <hr class="rule" style="max-width:60px; margin:28px auto 0; border-top-color:var(--brass);">
+      </div>
+    </section>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="page" id="page-testimonials">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <span class="eyebrow" data-reveal><span class="issue-no">N&deg; 06</span>Testimonials</span>
+        <h1 data-reveal style="animation-delay:.05s">Academic & peer feedback.</h1>
+        <p class="lede" data-reveal style="animation-delay:.1s">I don't have paid client testimonials yet — but here's how people who've worked alongside me in school describe collaborating with me. These are placeholders until I have client feedback to share.</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="grid-3" data-reveal>
+          <div class="quote-card">
+            <span class="placeholder-tag">Placeholder</span>
+            <div class="quote-mark">"</div>
+            <p class="quote-text">Charles was the one who kept our group on schedule. He'd flag deadlines days before they snuck up on the rest of us.</p>
+            <div class="quote-source">
+              <div class="quote-avatar">JR</div>
+              <div><div class="quote-name">Groupmate</div><div class="quote-role">Systems Integration Project</div></div>
+            </div>
+          </div>
+          <div class="quote-card">
+            <span class="placeholder-tag">Placeholder</span>
+            <div class="quote-mark">"</div>
+            <p class="quote-text">He organized our research files so well that anyone on the team could find what they needed without asking.</p>
+            <div class="quote-source">
+              <div class="quote-avatar">MA</div>
+              <div><div class="quote-name">Classmate</div><div class="quote-role">Capstone Research</div></div>
+            </div>
+          </div>
+          <div class="quote-card">
+            <span class="placeholder-tag">Placeholder</span>
+            <div class="quote-mark">"</div>
+            <p class="quote-text">Reliable, calm under pressure, and always double-checked the details before sending anything out.</p>
+            <div class="quote-source">
+              <div class="quote-avatar">KD</div>
+              <div><div class="quote-name">Co-Officer</div><div class="quote-role">CCC Student Organization</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- FAQ -->
+  <section class="page" id="page-faq">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <span class="eyebrow" data-reveal><span class="issue-no">N&deg; 07</span>FAQ</span>
+        <h1 data-reveal style="animation-delay:.05s">Frequently asked questions.</h1>
+        <p class="lede" data-reveal style="animation-delay:.1s">A few things people usually want to know before reaching out.</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="wrap" style="max-width:760px;" data-reveal>
+        <div class="faq-item">
+          <button class="faq-q"><h4>Are you new to virtual assistant work?</h4><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>I'm at the start of my professional VA career, yes — but not new to the work itself. I've spent years managing calendars, inboxes, and files for my own academic responsibilities, and I bring that same discipline to every client engagement.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><h4>What hours are you available?</h4><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>My availability flexes around my class schedule, so I keep it predictable and communicate it clearly upfront. Reach out and we can map out hours that work for both of us.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><h4>Do you offer CRM management?</h4><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Not currently — I'm focused on doing a few things well: email management, calendar management, data entry, research, document formatting, spreadsheets, file organization, and general admin support.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><h4>How do we communicate during a project?</h4><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Mainly through email and Google Meet or Zoom, with a written brief at the start of any task so expectations are clear. I check in regularly rather than going quiet until something's "done."</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><h4>What's your pricing like?</h4><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>It depends on scope and how much ongoing support you need. Send me a message with what you have in mind and I'll put together a straightforward quote.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q"><h4>Which tools do you use?</h4><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Mainly Google Workspace and Microsoft Office, plus Canva and Zoom. <a href="#tools" data-nav="tools" style="color:var(--navy-600); text-decoration:underline;">See the full list →</a></p></div></div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="page" id="page-contact">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <span class="eyebrow" data-reveal><span class="issue-no">N&deg; 08</span>Contact</span>
+        <h1 data-reveal style="animation-delay:.05s">Let's work together.</h1>
+        <p class="lede" data-reveal style="animation-delay:.1s">Tell me a bit about what you need help with, and I'll get back to you within a day.</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="wrap contact-grid">
+        <div data-reveal>
+          <div class="contact-info-card">
+            <h3>Charles Meer</h3>
+            <p style="color:rgba(255,255,255,.55); margin-top:6px; font-size:.9rem;">Administrative Virtual Assistant</p>
+
+            <div class="contact-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <div><div class="label">Location</div><div class="value">Calamba City, Laguna, Philippines</div></div>
+            </div>
+            <div class="contact-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg>
+              <div><div class="label">Email</div><div class="value">charles.meer.va@email.com <span style="opacity:.5; font-size:.75rem;">(placeholder)</span></div></div>
+            </div>
+            <div class="contact-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 11v5M8 8v.01M12 16v-5M12 11c1.5-1.5 4-1.5 4 0v5"/></svg>
+              <div><div class="label">LinkedIn</div><div class="value">linkedin.com/in/charlesmeer <span style="opacity:.5; font-size:.75rem;">(placeholder)</span></div></div>
+            </div>
+
+            <div class="social-row">
+              <a href="#" class="social-btn" aria-label="LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 11v5M8 8v.01M12 16v-5M12 11c1.5-1.5 4-1.5 4 0v5"/></svg></a>
+              <a href="#" class="social-btn" aria-label="Email"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg></a>
+            </div>
+          </div>
+        </div>
+
+        <div data-reveal>
+          <form id="contactForm">
+            <div class="form-grid">
+              <div class="field"><label>Full Name</label><input type="text" required placeholder="Your name"></div>
+              <div class="field"><label>Email Address</label><input type="email" required placeholder="you@company.com"></div>
+              <div class="field full"><label>What do you need help with?</label>
+                <select>
+                  <option>Email Management</option>
+                  <option>Calendar Management</option>
+                  <option>Data Entry</option>
+                  <option>Internet Research</option>
+                  <option>Document Formatting</option>
+                  <option>Spreadsheet Management</option>
+                  <option>File Organization</option>
+                  <option>General Administrative Support</option>
+                  <option>Not sure yet</option>
+                </select>
+              </div>
+              <div class="field full"><label>Message</label><textarea required placeholder="Tell me a bit about what you're looking for..."></textarea></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+            <p class="form-note">This form doesn't send automatically yet — connect it to your email service of choice, or reach out directly using the details on the left.</p>
+            <div class="success-msg" id="successMsg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+              Thanks for reaching out — I'll get back to you as soon as I can.
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="brand" style="color:#fff;">
+          <span class="brand-mark">CM</span>
+          <span class="brand-text" style="color:#fff;">Charles Meer<span>Virtual Assistant</span></span>
+        </div>
+        <p>Detail-driven admin support so you can focus on growing your business.</p>
+      </div>
+      <div>
+        <h5>Navigate</h5>
+        <a href="#home" data-nav="home">Home</a>
+        <a href="#about" data-nav="about">About Me</a>
+        <a href="#services" data-nav="services">Services</a>
+        <a href="#skills" data-nav="skills">Skills</a>
+      </div>
+      <div>
+        <h5>More</h5>
+        <a href="#tools" data-nav="tools">Tools</a>
+        <a href="#why" data-nav="why">Why Hire Me</a>
+        <a href="#testimonials" data-nav="testimonials">Testimonials</a>
+        <a href="#faq" data-nav="faq">FAQ</a>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <a href="#contact" data-nav="contact">Calamba City, Laguna, PH</a>
+        <a href="#contact" data-nav="contact">Email Me</a>
+        <a href="#contact" data-nav="contact">LinkedIn</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Charles Meer. All rights reserved.</span>
+      <span>Built with care for detail.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ---- Navigation / SPA routing ----
+  const pages = document.querySelectorAll('.page');
+  const navLinks = document.querySelectorAll('[data-nav]');
+  const primaryLinks = document.getElementById('primaryLinks');
+  const hamburger = document.getElementById('hamburger');
+
+  function showPage(id, updateHash = true){
+    let found = false;
+    pages.forEach(p => {
+      if (p.id === 'page-' + id){ p.classList.add('active'); found = true; }
+      else p.classList.remove('active');
+    });
+    if (!found){ document.getElementById('page-home').classList.add('active'); id = 'home'; }
+
+    navLinks.forEach(l => {
+      if (l.closest('.primary-links')) {
+        l.classList.toggle('active', l.dataset.nav === id);
+      }
+    });
+
+    if (updateHash){
+      try { history.pushState(null, '', '#' + id); }
+      catch(err) { try { location.hash = id; } catch(e2) {} }
+    }
+    window.scrollTo({top:0, behavior:'instant'});
+    primaryLinks.classList.remove('open');
+    hamburger.classList.remove('open');
+
+    // restart reveal animations
+    const active = document.getElementById('page-' + id);
+    active.querySelectorAll('[data-reveal]').forEach((el, i) => {
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animationDelay = (i * 0.05) + 's';
+      el.style.animation = '';
+    });
+  }
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      showPage(link.dataset.nav);
+    });
+  });
+
+  window.addEventListener('popstate', () => {
+    const id = location.hash.replace('#','') || 'home';
+    showPage(id, false);
+  });
+
+  hamburger.addEventListener('click', () => {
+    primaryLinks.classList.toggle('open');
+    hamburger.classList.toggle('open');
+  });
+
+  // initial load
+  showPage(location.hash.replace('#','') || 'home', false);
+
+  // ---- FAQ accordion ----
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const q = item.querySelector('.faq-q');
+    const a = item.querySelector('.faq-a');
+    q.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(other => {
+        if (other !== item){
+          other.classList.remove('open');
+          other.querySelector('.faq-a').style.maxHeight = null;
+        }
+      });
+      if (isOpen){
+        item.classList.remove('open');
+        a.style.maxHeight = null;
+      } else {
+        item.classList.add('open');
+        a.style.maxHeight = a.scrollHeight + 'px';
+      }
+    });
+  });
+
+  // ---- Contact form (client-side only) ----
+  const form = document.getElementById('contactForm');
+  const successMsg = document.getElementById('successMsg');
+  if (form){
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      successMsg.classList.add('show');
+      form.reset();
+      setTimeout(() => successMsg.classList.remove('show'), 6000);
+    });
+  }
+
+  // ---- Nav background on scroll (subtle) ----
+  const siteNav = document.querySelector('.site-nav');
+  window.addEventListener('scroll', () => {
+    siteNav.style.background = window.scrollY > 20 ? 'rgba(10,22,38,.96)' : 'rgba(10,22,38,.88)';
+  });
+</script>
+
+</body>
+</html>
